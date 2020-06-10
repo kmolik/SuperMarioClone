@@ -18,6 +18,7 @@ import com.mygdx.mario.Scenes.Hud;
 import com.mygdx.mario.Sprites.Mario;
 import com.mygdx.mario.SuperMario;
 import com.mygdx.mario.tools.B2WorldCreator;
+import com.mygdx.mario.tools.WorldContactListener;
 
 public class PlayScreen implements Screen {
 
@@ -58,6 +59,8 @@ public class PlayScreen implements Screen {
         new B2WorldCreator(world, map);
 
         player = new Mario(world, this);
+
+        world.setContactListener(new WorldContactListener());
 
     }
 
