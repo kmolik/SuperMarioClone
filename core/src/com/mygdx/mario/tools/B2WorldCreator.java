@@ -9,12 +9,16 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
+import com.mygdx.mario.Screens.PlayScreen;
 import com.mygdx.mario.Sprites.Brick;
 import com.mygdx.mario.Sprites.Coin;
 import com.mygdx.mario.SuperMario;
 
 public class B2WorldCreator {
-    public B2WorldCreator(World world, TiledMap map) {
+    public B2WorldCreator(PlayScreen screen) {
+        World world = screen.getWorld();
+        TiledMap map = screen.getMap();
+
         BodyDef bdef = new BodyDef();
         PolygonShape shape = new PolygonShape();
         FixtureDef fdef = new FixtureDef();
@@ -46,19 +50,21 @@ public class B2WorldCreator {
 
             shape.setAsBox(rect.getWidth() /2 / SuperMario.PPM, rect.getHeight() / 2 / SuperMario.PPM);
             fdef.shape = shape;
+            fdef.filter.categoryBits = SuperMario.OBJECT_BIT;
             body.createFixture(fdef);
         }
         // creating brick bodies/fixtures
         for(MapObject object: map.getLayers().get(5).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
-            new Brick(world, map, rect);
+            new Brick(screen, rect);
         }
         // creating coin bodies/fixtures
         for(MapObject object: map.getLayers().get(4).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
-            new Coin(world, map, rect);
+            new Coin(screen, rect);
+
         }
     }
 }
