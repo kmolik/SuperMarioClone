@@ -13,14 +13,21 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.mario.Scenes.Hud;
-import com.mygdx.mario.Sprites.Goomba;
+import com.mygdx.mario.Sprites.Enemies.Enemy;
+import com.mygdx.mario.Sprites.Items.Item;
+import com.mygdx.mario.Sprites.Items.ItemDef;
+import com.mygdx.mario.Sprites.Items.Mushroom;
 import com.mygdx.mario.Sprites.Mario;
 import com.mygdx.mario.SuperMario;
 import com.mygdx.mario.tools.B2WorldCreator;
 import com.mygdx.mario.tools.WorldContactListener;
+
+import java.util.PriorityQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 public class PlayScreen implements Screen {
 
@@ -39,11 +46,14 @@ public class PlayScreen implements Screen {
     //Box2d variables
     private World world;
     private Box2DDebugRenderer b2dr;
+    private B2WorldCreator creator;
 
     private Mario player;
-    private Goomba goomba;
 
     private Music music;
+
+    private Array<Item> items;
+    private LinkedBlockingDeque<ItemDef> itemsToSpawn;
 
     public PlayScreen(SuperMario game) {
         atlas = new TextureAtlas("Mario_and_Enemies.pack");
@@ -61,7 +71,7 @@ public class PlayScreen implements Screen {
         world = new World(new Vector2(0, -10), true);
         b2dr = new Box2DDebugRenderer();
 
-        new B2WorldCreator(this);
+        creator = new B2WorldCreator(this);
 
         player = new Mario(this);
 
@@ -72,8 +82,21 @@ public class PlayScreen implements Screen {
         music.setLooping(true);
         music.play();
 
-        goomba = new Goomba(this, 5.32f, .32f);
+        items = new Array<Item>();
+        itemsToSpawn = new LinkedBlockingDeque<ItemDef>();
+    }
 
+    public void spawnItem(ItemDef idef) {
+        itemsToSpawn.add(idef);
+    }
+
+    public void handleSpawningItems(){
+        if(!itemsToSpawn.isEmpty()){
+            ItemDef idef = itemsToSpawn.poll();
+            if(idef.type == Mushroom.class){
+                items.add(new Mushroom(this, idef.position.x, idef.position.y));
+            }
+        }
     }
 
     public TextureAtlas getAtlas() {
@@ -96,11 +119,21 @@ public class PlayScreen implements Screen {
 
     public void update(float dt) {
         handleInput(dt);
+        handleSpawningItems();
 
         world.step(1/60f, 6, 2);
 
         player.update(dt);
-        goomba.update(dt);
+        for(Enemy enemy : creator.getGoombas())
+        {
+            enemy.update(dt);
+            if(enemy.getX() < player.getX() + 224 / SuperMario.PPM)
+                enemy.b2body.setActive(true);
+        }
+
+        for(Item item: items)
+            item.update(dt);
+
         hud.update(dt);
 
         gameCam.position.x = player.b2body.getPosition().x;
@@ -126,7 +159,10 @@ public class PlayScreen implements Screen {
         game.batch.setProjectionMatrix(gameCam.combined);
         game.batch.begin();
         player.draw(game.batch);
-        goomba.draw(game.batch);
+        for(Enemy enemy : creator.getGoombas())
+            enemy.draw(game.batch);
+        for(Item item : items )
+            item.draw(game.batch);
         game.batch.end();
 
         game.batch.setProjectionMatrix(hud.stage.getCamera().combined);

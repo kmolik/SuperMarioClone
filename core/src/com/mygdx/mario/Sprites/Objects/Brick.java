@@ -1,17 +1,16 @@
-package com.mygdx.mario.Sprites;
+package com.mygdx.mario.Sprites.Objects;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.mario.Scenes.Hud;
 import com.mygdx.mario.Screens.PlayScreen;
 import com.mygdx.mario.SuperMario;
 
 public class Brick extends InteractiveTileObject {
-    public Brick(PlayScreen screen, Rectangle bounds) {
-        super(screen, bounds);
+    public Brick(PlayScreen screen, MapObject object) {
+        super(screen, object);
         fixture.setUserData(this);
         setCategoryFilter(SuperMario.BRICK_BIT);
     }

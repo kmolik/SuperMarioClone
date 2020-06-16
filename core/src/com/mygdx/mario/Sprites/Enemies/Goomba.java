@@ -1,4 +1,4 @@
-package com.mygdx.mario.Sprites;
+package com.mygdx.mario.Sprites.Enemies;
 
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.mario.Screens.PlayScreen;
+import com.mygdx.mario.Sprites.Enemies.Enemy;
 import com.mygdx.mario.SuperMario;
 
 public class Goomba extends Enemy {
@@ -59,8 +60,7 @@ public class Goomba extends Enemy {
         FixtureDef fdef = new FixtureDef();
         CircleShape shape = new CircleShape();
         shape.setRadius(6 / SuperMario.PPM);
-        fdef.filter.categoryBits = SuperMario.ENEMY_BIT |
-                SuperMario.MARIO_BIT;
+        fdef.filter.categoryBits = SuperMario.ENEMY_BIT;
         fdef.filter.maskBits = SuperMario.GROUND_BIT |
                 SuperMario.COIN_BIT |
                 SuperMario.BRICK_BIT |
