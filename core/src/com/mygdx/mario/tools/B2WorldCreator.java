@@ -11,6 +11,8 @@ import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.mario.Screens.PlayScreen;
+import com.mygdx.mario.Sprites.Enemies.Enemy;
+import com.mygdx.mario.Sprites.Enemies.Turtle;
 import com.mygdx.mario.Sprites.Objects.Brick;
 import com.mygdx.mario.Sprites.Objects.Coin;
 import com.mygdx.mario.Sprites.Enemies.Goomba;
@@ -18,6 +20,7 @@ import com.mygdx.mario.SuperMario;
 
 public class B2WorldCreator {
     private Array<Goomba> goombas;
+    private Array<Turtle> turtles;
 
     public B2WorldCreator(PlayScreen screen) {
         World world = screen.getWorld();
@@ -76,9 +79,22 @@ public class B2WorldCreator {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
             goombas.add(new Goomba(screen, rect.getX() / SuperMario.PPM, rect.getY() / SuperMario.PPM));
         }
+
+        turtles = new Array<Turtle>();
+
+        for(MapObject object: map.getLayers().get(7).getObjects().getByType(RectangleMapObject.class)) {
+            Rectangle rect = ((RectangleMapObject) object).getRectangle();
+            turtles.add(new Turtle(screen, rect.getX() / SuperMario.PPM, rect.getY() / SuperMario.PPM));
+        }
     }
 
-    public  Array<Goomba> getGoombas() {
-        return goombas;
+//    public  Array<Goomba> getGoombas() {
+//        return goombas;
+//    }
+    public  Array<Enemy> getEnemies() {
+        Array<Enemy> enemies = new Array<Enemy>();
+        enemies.addAll(goombas);
+        enemies.addAll(turtles);
+        return enemies;
     }
 }

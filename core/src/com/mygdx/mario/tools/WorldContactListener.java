@@ -20,21 +20,19 @@ public class WorldContactListener implements ContactListener {
 
         int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
 
-        if(fixA.getUserData() == "head" || fixB.getUserData() == "head") {
-            Fixture head = fixA.getUserData() == "head" ? fixA : fixB;
-            Fixture object = head == fixA ? fixB : fixA;
-
-            if(object.getUserData() != null  && InteractiveTileObject.class.isAssignableFrom(object.getUserData().getClass())) {
-                ((InteractiveTileObject) object.getUserData()).onHeadHit();
-            }
-        }
-
         switch (cDef) {
+            case SuperMario.MARIO_HEAD_BIT | SuperMario.BRICK_BIT:
+            case SuperMario.MARIO_HEAD_BIT | SuperMario.COIN_BIT:
+                if(fixA.getFilterData().categoryBits == SuperMario.MARIO_HEAD_BIT)
+                    ((InteractiveTileObject) fixB.getUserData()).onHeadHit((Mario) fixA.getUserData());
+                else
+                    ((InteractiveTileObject) fixA.getUserData()).onHeadHit((Mario) fixB.getUserData());
+                break;
             case SuperMario.ENEMY_HEAD_BIT | SuperMario.MARIO_BIT:
                 if(fixA.getFilterData().categoryBits == SuperMario.ENEMY_HEAD_BIT)
-                    ((Enemy)fixA.getUserData()).hitOnHead();
+                    ((Enemy)fixA.getUserData()).hitOnHead((Mario) fixB.getUserData());
                 else
-                    ((Enemy)fixB.getUserData()).hitOnHead();
+                    ((Enemy)fixB.getUserData()).hitOnHead((Mario) fixA.getUserData());
                 break;
             case SuperMario.ENEMY_BIT | SuperMario.OBJECT_BIT:
                 if(fixA.getFilterData().categoryBits == SuperMario.ENEMY_BIT)
@@ -43,11 +41,14 @@ public class WorldContactListener implements ContactListener {
                     ((Enemy)fixB.getUserData()).reverseVelocity(true, false);
                 break;
             case SuperMario.MARIO_BIT | SuperMario.ENEMY_BIT:
-                Gdx.app.log("Mario", "DIED");
+                if(fixA.getFilterData().categoryBits == SuperMario.MARIO_BIT)
+                    ((Mario) fixA.getUserData()).hit((Enemy)fixB.getUserData());
+                else
+                    ((Mario) fixB.getUserData()).hit((Enemy)fixA.getUserData());
                 break;
             case SuperMario.ENEMY_BIT | SuperMario.ENEMY_BIT:
-                ((Enemy)fixA.getUserData()).reverseVelocity(true, false);
-                ((Enemy)fixB.getUserData()).reverseVelocity(true, false);
+                ((Enemy)fixA.getUserData()).onEnemyHit((Enemy)fixB.getUserData());
+                ((Enemy)fixB.getUserData()).onEnemyHit((Enemy)fixA.getUserData());
                 break;
             case SuperMario.ITEM_BIT | SuperMario.OBJECT_BIT:
                 if(fixA.getFilterData().categoryBits == SuperMario.ITEM_BIT)
