@@ -25,6 +25,7 @@ public class Mario extends Sprite {
     public enum State { FALLING, JUMPING, STANDING, RUNNING, GROWING, DEAD  }
     public State currentState;
     public State previousState;
+    private float stateTimer;
 
     public World world;
     public Body b2body;
@@ -38,7 +39,6 @@ public class Mario extends Sprite {
     private TextureRegion marioDead;
     private Animation<TextureRegion> growMario;
 
-    private float stateTimer;
     private boolean runningRight;
     private boolean marioIsBig;
     private boolean runGrowAnimation;
